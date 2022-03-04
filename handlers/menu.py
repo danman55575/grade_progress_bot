@@ -1,6 +1,6 @@
 from aiogram import types, Dispatcher
 from bot_manager import bot, admin
-from keyboard import back
+from keyboards import back
 from aiogram.dispatcher import FSMContext
 import sqlite3
 
