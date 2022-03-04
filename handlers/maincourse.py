@@ -1,6 +1,6 @@
 from aiogram import Dispatcher
 from bot_manager import dp, bot, StQuiz
-from keyboard import *
+from keyboards import *
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 import re
