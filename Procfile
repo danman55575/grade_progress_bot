@@ -1,0 +1,1 @@
+worker: python progress_bot.py
