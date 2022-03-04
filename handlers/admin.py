@@ -1,7 +1,7 @@
 from aiogram import types, Dispatcher
 from bot_manager import StQuiz, admin
 from aiogram.dispatcher import FSMContext
-from keyboard import adminlookboard, admindeleteboard
+from keyboards import adminlookboard, admindeleteboard
 import sqlite3
 
 
