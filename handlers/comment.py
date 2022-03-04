@@ -1,5 +1,5 @@
 from aiogram import types, Dispatcher
-from keyboard import back
+from keyboards import back
 from aiogram.dispatcher import FSMContext
 from bot_manager import StQuiz, bot, admin
 import sqlite3
