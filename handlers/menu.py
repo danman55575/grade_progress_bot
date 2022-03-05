@@ -25,7 +25,7 @@ async def main(message: types.Message, state: FSMContext):
     keyboard = types.InlineKeyboardMarkup(row_width=2)
     buttons = [types.InlineKeyboardButton(text='Начать!', callback_data='begin'),
                types.InlineKeyboardButton(text='Помощь', callback_data='help'),
-               types.InlineKeyboardButton(text='Оставить отзыв', callback_data='review')]
+               types.InlineKeyboardButton(text='Оставить отзыв📢', callback_data='review')]
     keyboard.add(*buttons)
     await message.answer('Привет! Это <b>главное меню</b>, здесь представлены все основные функции '
                          'бота <i>GradeProgress Bot</i>.', reply_markup=keyboard)
