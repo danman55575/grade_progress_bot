@@ -8,8 +8,8 @@ import sqlite3
 async def admintable(msg: types.Message):
     if msg.from_user.id == admin:
         adminboard = types.InlineKeyboardMarkup(row_width=1)
-        adminboard.add(types.InlineKeyboardButton(text='Задать выборку', callback_data='look_table'),
-                       types.InlineKeyboardButton(text='Работа с бд', callback_data='del_note'))
+        adminboard.add(types.InlineKeyboardButton(text='Выборка из бд', callback_data='look_table'),
+                       types.InlineKeyboardButton(text='Работа с бд', callback_data='change_bd'))
         await msg.answer(f'Привет, {msg.from_user.full_name}, {msg.from_user.username}!\nТвой id: {msg.from_user.id}\n')
         db = sqlite3.connect('grade_progress_bot.db')
         cursor = db.cursor()
@@ -62,14 +62,14 @@ async def output_note(msg: types.Message, state: FSMContext):
             await state.finish()
 
 
-async def delete_note(call: types.CallbackQuery):
+async def change_bd(call: types.CallbackQuery):
     await call.message.answer('Отправь SQL-запрос',
                               reply_markup=admindeleteboard())
     await call.answer('РАБОТА С БД!')
     await StQuiz.del_note.set()
 
 
-async def input_delete(msg: types.Message, state: FSMContext):
+async def output_result(msg: types.Message, state: FSMContext):
     db = sqlite3.connect('grade_progress_bot.db')
     cursor = db.cursor()
     try:
@@ -89,5 +89,5 @@ def register_handlers_admin(dp: Dispatcher):
     dp.register_message_handler(admintable, commands='admin3027')
     dp.register_callback_query_handler(my_table, text='look_table')
     dp.register_message_handler(output_note, state=StQuiz.look_table)
-    dp.register_callback_query_handler(delete_note, text='del_note')
-    dp.register_message_handler(input_delete, state=StQuiz.del_note)
+    dp.register_callback_query_handler(change_bd, text='change_bd')
+    dp.register_message_handler(output_result, state=StQuiz.del_note)
