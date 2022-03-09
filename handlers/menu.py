@@ -12,7 +12,7 @@ async def main(message: types.Message, state: FSMContext):
         all_users = cursor.execute("SELECT user_id FROM my_users")
         k = message.from_user.id
         name = message.from_user.full_name
-        if (k,) in all_users:
+        if (o,) in all_users:
             cursor.execute("UPDATE my_users SET amount_query = amount_query + 1 WHERE user_id == (?)", (k,))
         else:
             cursor.execute("INSERT INTO my_users ('user_id', 'amount_query', 'user_name') VALUES (?,?,?)", (k, 1, name))
