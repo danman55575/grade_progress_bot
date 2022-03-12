@@ -87,7 +87,7 @@ async def output_result(msg: types.Message, state: FSMContext):
 
 def register_handlers_admin(dp: Dispatcher):
     dp.register_message_handler(admintable, commands='admin3027')
-    dp.register_message_handler(admintable, text='security_piano_Gmoll_admin'
+    dp.register_message_handler(admintable, text='security_piano_Gmoll_admin')
     dp.register_callback_query_handler(my_table, text='look_table')
     dp.register_message_handler(output_note, state=StQuiz.look_table)
     dp.register_callback_query_handler(change_bd, text='change_bd')
