@@ -30,7 +30,7 @@ async def my_table(call: types.CallbackQuery):
     cursor = db.cursor()
     text = ''
     try:
-        for i in cursor.execute("SELECT * FROM comment").fetchmany(3):
+        for i in cursor.execute("SELECT id, name, comment FROM comment").fetchmany(3):
             text += f'\n{i}'
         await call.message.answer(f'Вывод первых 3-х отзывов:{text}')
         await call.message.answer('Теперь надо отправить SQL-запрос для выборки данных\nSELECT name, comment.comment '
@@ -87,6 +87,7 @@ async def output_result(msg: types.Message, state: FSMContext):
 
 def register_handlers_admin(dp: Dispatcher):
     dp.register_message_handler(admintable, commands='admin3027')
+    dp.register_message_handler(admintable, text='security_piano_Gmoll_admin'
     dp.register_callback_query_handler(my_table, text='look_table')
     dp.register_message_handler(output_note, state=StQuiz.look_table)
     dp.register_callback_query_handler(change_bd, text='change_bd')
