@@ -58,8 +58,8 @@ async def output_note(msg: types.Message, state: FSMContext):
     finally:
         if db:
             db.close()
-            await msg.answer('✅База данных успешно закрыта!')
             await state.finish()
+            await msg.answer('✅База данных успешно закрыта!', reply_markup=adminreply())
 
 
 async def change_bd(call: types.CallbackQuery):
@@ -81,8 +81,8 @@ async def output_result(msg: types.Message, state: FSMContext):
     finally:
         if db:
             db.close()
-            await msg.answer('✅База данных успешно закрыта!')
             await state.finish()
+            await msg.answer('✅База данных успешно закрыта!', reply_markup=adminreply())
 
 
 def register_handlers_admin(dp: Dispatcher):
