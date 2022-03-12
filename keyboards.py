@@ -1,11 +1,6 @@
 from aiogram import types
 
 
-def noboard():
-    markup = types.ReplyKeyboardRemove
-    return markup
-
-
 # Простая подсказка 'В меню'
 def back():
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
@@ -72,13 +67,14 @@ def adminlookboard():
     query1 = types.KeyboardButton('SELECT * FROM my_users')
     query2 = types.KeyboardButton('SELECT * FROM comment LIMIT 3, 5')
     query3 = types.KeyboardButton('SELECT * FROM comment')
-    markup.add(query1, query2, query3)
+    query4 = types.KeyboardButton('security_piano_Gmoll_admin')
+    markup.add(query1, query2, query3, query4)
     return markup
 
 
 def admindeleteboard():
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1, one_time_keyboard=True)
-    query1 = types.KeyboardButton('DELETE FROM comment WHERE id == 1')
-    query2 = types.KeyboardButton("DELETE FROM comment WHERE name LIKE 'Ж%'")
+    query1 = types.KeyboardButton('DELETE FROM comment WHERE id < 10')
+    query2 = types.KeyboardButton('security_piano_Gmoll_admin')
     markup.add(query1, query2)
     return markup
