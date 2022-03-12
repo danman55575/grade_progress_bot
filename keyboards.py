@@ -17,12 +17,12 @@ def finish2():
 
 # Выбор способа расчёта
 def choose_way():
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True, row_width=2)
-    buttons = [types.KeyboardButton('Последовательность📊'),
-               types.KeyboardButton('Количество🧮'),
-               types.KeyboardButton('Назад↩'),
-               types.KeyboardButton('В меню')]
-    markup.add(*buttons)
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True, row_width=1)
+    item1 = types.KeyboardButton('Последовательность📊'),
+    item2 = types.KeyboardButton('Количество🧮'),
+    item3 = types.KeyboardButton('Назад↩'),
+    item4 = types.KeyboardButton('В меню')]
+    markup.add(item1, item2).row(item3, item4)
     return markup
 
 
