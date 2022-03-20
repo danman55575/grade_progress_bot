@@ -2,7 +2,7 @@ from aiogram import types, Dispatcher
 from keyboards import back
 from aiogram.dispatcher import FSMContext
 from bot_manager import StQuiz, bot, admin
-import sqlite3
+import psycopg2
 
 
 async def idea(call: types.CallbackQuery):
@@ -12,14 +12,15 @@ async def idea(call: types.CallbackQuery):
 
 
 async def apply(message: types.Message, state: FSMContext):
-    db = sqlite3.connect('grade_progress_bot.db')
+    db = psycopg2.connect('postgres://sbfqqjimvvqzyc:05185c25d6ef587b7cb9f85541a9902030e39dabe606c765a6f77ea9da80c544'
+                          '@ec2-54-74-14-109.eu-west-1.compute.amazonaws.com:5432/d4eaaaje408rv8')
+    db.autocommit = True
     cursor = db.cursor()
     try:
         comment = message.text
         user_id = message.from_user.id
         name = message.from_user.full_name
-        cursor.execute("INSERT INTO comment ('comment', 'user_id', 'name') VALUES (?,?,?)", (comment, user_id, name))
-        db.commit()
+        cursor.execute("INSERT INTO comment (comment, user_id, user_name) VALUES (%s, %s, %s)", (comment, user_id, name))
     except Exception as e:
         await bot.send_message(admin, f'Что-то пошло не так в "comment.py", вот:\n{e}', disable_notification=True)
     finally:
