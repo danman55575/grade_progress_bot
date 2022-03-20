@@ -1,8 +1,8 @@
 from aiogram import types, Dispatcher
 from bot_manager import StQuiz, admin
 from aiogram.dispatcher import FSMContext
-from keyboards import adminlookboard, admindeleteboard
-import sqlite3
+from keyboards import adminlookboard, admindeleteboard, adminreply
+import psycopg2
 
 
 async def admintable(msg: types.Message):
@@ -11,11 +11,15 @@ async def admintable(msg: types.Message):
         adminboard.add(types.InlineKeyboardButton(text='Выборка из бд', callback_data='look_table'),
                        types.InlineKeyboardButton(text='Работа с бд', callback_data='change_bd'))
         await msg.answer(f'Привет, {msg.from_user.full_name}, {msg.from_user.username}!\nТвой id: {msg.from_user.id}\n')
-        db = sqlite3.connect('grade_progress_bot.db')
+        db = psycopg2.connect('postgres://sbfqqjimvvqzyc:05185c25d6ef587b7cb9f85541a9902030e39dabe606c765a6f77ea9da80'
+                              'c544@ec2-54-74-14-109.eu-west-1.compute.amazonaws.com:5432/d4eaaaje408rv8')
+        db.autocommit = True
         cursor = db.cursor()
         try:
-            count_comments = cursor.execute("SELECT count() FROM comment").fetchone()[0]
-            count_users = cursor.execute("SELECT count() FROM my_users").fetchone()[0]
+            cursor.execute("SELECT count(*) FROM comment")
+            count_comments = cursor.fetchone()[0]
+            cursor.execute("SELECT count(*) FROM my_users")
+            count_users = cursor.fetchone()[0]
             await msg.answer(f'количество отзывов: {count_comments}'
                              f'\nколичество пользователей: {count_users}', reply_markup=adminboard)
         except Exception as e:
@@ -26,16 +30,17 @@ async def admintable(msg: types.Message):
 
 
 async def my_table(call: types.CallbackQuery):
-    db = sqlite3.connect('grade_progress_bot.db')
+    db = psycopg2.connect('postgres://sbfqqjimvvqzyc:05185c25d6ef587b7cb9f85541a9902030e39dabe606c765a6f77ea9da80c'
+                          '544@ec2-54-74-14-109.eu-west-1.compute.amazonaws.com:5432/d4eaaaje408rv8')
+    db.autocommit = True
     cursor = db.cursor()
     text = ''
     try:
-        for i in cursor.execute("SELECT id, name, comment FROM comment").fetchmany(3):
+        cursor.execute("SELECT id, user_name, comment FROM comment")
+        for i in cursor.fetchmany(3):
             text += f'\n{i}'
         await call.message.answer(f'Вывод первых 3-х отзывов:{text}')
-        await call.message.answer('Теперь надо отправить SQL-запрос для выборки данных\nSELECT name, comment.comment '
-                                  'FROM my_users LEFT JOIN comment ON my_users.user_id == comment.user_id',
-                                  reply_markup=adminlookboard())
+        await call.message.answer('Теперь надо отправить SQL-запрос для выборки данных', reply_markup=adminlookboard())
         await StQuiz.look_table.set()
     except Exception as e:
         await call.message.answer(f'Что-то пошло не так, вот:\n{e}')
@@ -46,11 +51,14 @@ async def my_table(call: types.CallbackQuery):
 
 
 async def output_note(msg: types.Message, state: FSMContext):
-    db = sqlite3.connect('grade_progress_bot.db')
+    db = psycopg2.connect('postgres://sbfqqjimvvqzyc:05185c25d6ef587b7cb9f85541a9902030e39dabe606c765a6f77ea9da80c544'
+                          '@ec2-54-74-14-109.eu-west-1.compute.amazonaws.com:5432/d4eaaaje408rv8')
+    db.autocommit = True
     cursor = db.cursor()
     text = ''
     try:
-        for i in cursor.execute(msg.text).fetchall():
+        cursor.execute(msg.text)
+        for i in cursor.fetchall():
             text += f'\n{i}'
         await msg.answer(f'✅Выборка прошла успешно:{text}')
     except Exception as e:
@@ -70,11 +78,12 @@ async def change_bd(call: types.CallbackQuery):
 
 
 async def output_result(msg: types.Message, state: FSMContext):
-    db = sqlite3.connect('grade_progress_bot.db')
+    db = psycopg2.connect('postgres://sbfqqjimvvqzyc:05185c25d6ef587b7cb9f85541a9902030e39dabe606c765a6f77ea9da80c544'
+                          '@ec2-54-74-14-109.eu-west-1.compute.amazonaws.com:5432/d4eaaaje408rv8')
+    db.autocommit = True
     cursor = db.cursor()
     try:
         cursor.execute(msg.text)
-        db.commit()
         await msg.answer('Успешно выполнено!')
     except Exception as e:
         await msg.answer(f'Что-то пошло не так, вот:\n{e}')
