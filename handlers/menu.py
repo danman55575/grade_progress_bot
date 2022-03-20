@@ -2,21 +2,23 @@ from aiogram import types, Dispatcher
 from bot_manager import bot, admin
 from keyboards import back
 from aiogram.dispatcher import FSMContext
-import sqlite3
+import psycopg2
 
 
 async def main(message: types.Message, state: FSMContext):
-    db = sqlite3.connect('grade_progress_bot.db')
+    db = psycopg2.connect('postgres://sbfqqjimvvqzyc:05185c25d6ef587b7cb9f85541a9902030e39dabe606c765a6f77ea9da80c544'
+                          '@ec2-54-74-14-109.eu-west-1.compute.amazonaws.com:5432/d4eaaaje408rv8')
+    db.autocommit = True
     cursor = db.cursor()
     try:
-        all_users = cursor.execute("SELECT user_id FROM my_users")
+        cursor.execute("SELECT user_id FROM my_users")
+        all_users = cursor.fetchall()
         k = message.from_user.id
         name = message.from_user.full_name
         if (k,) in all_users:
-            cursor.execute("UPDATE my_users SET amount_query = amount_query + 1 WHERE user_id == (?)", (k,))
+            cursor.execute("UPDATE my_users SET amount_query = amount_query + 1 WHERE user_id = %s", (k,))
         else:
-            cursor.execute("INSERT INTO my_users ('user_id', 'amount_query', 'user_name') VALUES (?,?,?)", (k, 1, name))
-        db.commit()
+            cursor.execute("INSERT INTO my_users (user_id, amount_query, user_name) VALUES (%s, %s, %s)", (k, 1, name))
     except Exception as e:
         await bot.send_message(admin, f'Что-то пошло не так в модуле "menu.py", вот:\n{e}', disable_notification=True)
     finally:
