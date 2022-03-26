@@ -132,7 +132,6 @@ async def calc_grade(grade, answer, score, amount, summa):
         await calc_grade(grade - 1, answer, score, amount, summa - answer)
 
 
-@dp.message_handler(text='Узнать больше📈')
 async def table(message: types.Message):
     global basa, data
     score = data['score_purpose']
