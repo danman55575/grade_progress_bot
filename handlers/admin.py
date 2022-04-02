@@ -1,5 +1,5 @@
 from aiogram import types, Dispatcher
-from bot_manager import StQuiz, admin
+from bot_manager import StQuiz, admin, bot, URI
 from aiogram.dispatcher import FSMContext
 from keyboards import adminlookboard, admindeleteboard, adminreply
 import psycopg2
@@ -9,10 +9,10 @@ async def admintable(msg: types.Message):
     if msg.from_user.id == admin:
         adminboard = types.InlineKeyboardMarkup(row_width=1)
         adminboard.add(types.InlineKeyboardButton(text='Выборка из бд', callback_data='look_table'),
-                       types.InlineKeyboardButton(text='Работа с бд', callback_data='change_bd'))
+                       types.InlineKeyboardButton(text='Работа с бд', callback_data='change_table'),
+                       types.InlineKeyboardButton(text='Отправить', callback_data='send'))
         await msg.answer(f'Привет, {msg.from_user.full_name}, {msg.from_user.username}!\nТвой id: {msg.from_user.id}\n')
-        db = psycopg2.connect('postgres://sbfqqjimvvqzyc:05185c25d6ef587b7cb9f85541a9902030e39dabe606c765a6f77ea9da80'
-                              'c544@ec2-54-74-14-109.eu-west-1.compute.amazonaws.com:5432/d4eaaaje408rv8')
+        db = psycopg2.connect(URI)
         db.autocommit = True
         cursor = db.cursor()
         try:
@@ -29,9 +29,8 @@ async def admintable(msg: types.Message):
                 db.close()
 
 
-async def my_table(call: types.CallbackQuery):
-    db = psycopg2.connect('postgres://sbfqqjimvvqzyc:05185c25d6ef587b7cb9f85541a9902030e39dabe606c765a6f77ea9da80c'
-                          '544@ec2-54-74-14-109.eu-west-1.compute.amazonaws.com:5432/d4eaaaje408rv8')
+async def look_table(call: types.CallbackQuery):
+    db = psycopg2.connect(URI)
     db.autocommit = True
     cursor = db.cursor()
     text = ''
@@ -50,9 +49,8 @@ async def my_table(call: types.CallbackQuery):
             await call.answer('База данных закрыта')
 
 
-async def output_note(msg: types.Message, state: FSMContext):
-    db = psycopg2.connect('postgres://sbfqqjimvvqzyc:05185c25d6ef587b7cb9f85541a9902030e39dabe606c765a6f77ea9da80c544'
-                          '@ec2-54-74-14-109.eu-west-1.compute.amazonaws.com:5432/d4eaaaje408rv8')
+async def output_result(msg: types.Message, state: FSMContext):
+    db = psycopg2.connect(URI)
     db.autocommit = True
     cursor = db.cursor()
     text = ''
@@ -73,13 +71,12 @@ async def output_note(msg: types.Message, state: FSMContext):
 async def change_bd(call: types.CallbackQuery):
     await call.message.answer('Отправь SQL-запрос',
                               reply_markup=admindeleteboard())
-    await call.answer('РАБОТА С БД!')
+    await call.answer('ВНЕСЕНИЕ ИЗМЕНЕНИЙ В БД!')
     await StQuiz.del_note.set()
 
 
-async def output_result(msg: types.Message, state: FSMContext):
-    db = psycopg2.connect('postgres://sbfqqjimvvqzyc:05185c25d6ef587b7cb9f85541a9902030e39dabe606c765a6f77ea9da80c544'
-                          '@ec2-54-74-14-109.eu-west-1.compute.amazonaws.com:5432/d4eaaaje408rv8')
+async def output_note(msg: types.Message, state: FSMContext):
+    db = psycopg2.connect(URI)
     db.autocommit = True
     cursor = db.cursor()
     try:
@@ -94,10 +91,29 @@ async def output_result(msg: types.Message, state: FSMContext):
             await msg.answer('✅База данных успешно закрыта!', reply_markup=adminreply())
 
 
+async def notification_out(call: types.CallbackQuery):
+    db = psycopg2.connect(URI)
+    db.autocommit = True
+    cursor = db.cursor()
+    try:
+        cursor.execute("SELECT user_id FROM my_users")
+        all_id = cursor.fetchall()
+        for i in all_id:
+            await bot.send_message(i[0], "Бот временно недоступен! Просим извинения за доставленные неудобства.\n"
+                                         "  <i>GradeProgress Bot</i>", disable_notification=True)
+    except Exception as e:
+        await call.message.answer(f'Что-то пошло не так, вот:\n{e}')
+    finally:
+        if db:
+            db.close()
+            await call.message.answer('✅База данных успешно закрыта!\nРассылка проведена успешно!', reply_markup=adminreply())
+
+
 def register_handlers_admin(dp: Dispatcher):
     dp.register_message_handler(admintable, commands='admin3027')
     dp.register_message_handler(admintable, text='security_piano_Gmoll_admin')
-    dp.register_callback_query_handler(my_table, text='look_table')
-    dp.register_message_handler(output_note, state=StQuiz.look_table)
+    dp.register_callback_query_handler(look_table, text='look_table')
+    dp.register_message_handler(output_result, state=StQuiz.look_table)
     dp.register_callback_query_handler(change_bd, text='change_bd')
-    dp.register_message_handler(output_result, state=StQuiz.del_note)
+    dp.register_message_handler(output_note, state=StQuiz.del_note)
+    dp.register_callback_query_handler(notification_out, text='send')
