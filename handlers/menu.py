@@ -1,13 +1,29 @@
 from aiogram import types, Dispatcher
-from bot_manager import bot, admin
+from bot_manager import bot, admin, URI
 from keyboards import back
 from aiogram.dispatcher import FSMContext
 import psycopg2
+instruction = """Инструкция по использованию <b>GradeProgress Bot</b>:
+
+1️⃣Кнопка <b>Начать</b> - приступить к опросу. Процесс опроса:
+  1-й этап. Ввод желаемого среднего балла;
+  2-й этап. Выбор способа расчёта:
+
+    1)"Количество отметок":
+      3-й этап. Ввод текущего количества отметок
+      4-й этап. Ввод текущего среднего балла
+
+    2)"Последовательность":
+      3-й этап. Ввод последовательности отметок
+
+2️⃣Кнопка <b>Оставить отзыв</b> - оценить бота. Так вы сможете повлиять на дальнейшее развитие бота 
+
+3️⃣Кнопка <b>Помощь</b> - показать инструкцию по использованию <b>GradeProgress Bot</b>
+"""
 
 
 async def main(message: types.Message, state: FSMContext):
-    db = psycopg2.connect('postgres://sbfqqjimvvqzyc:05185c25d6ef587b7cb9f85541a9902030e39dabe606c765a6f77ea9da80c544'
-                          '@ec2-54-74-14-109.eu-west-1.compute.amazonaws.com:5432/d4eaaaje408rv8')
+    db = psycopg2.connect(URI)
     db.autocommit = True
     cursor = db.cursor()
     try:
@@ -34,29 +50,18 @@ async def main(message: types.Message, state: FSMContext):
     await state.finish()
 
 
-async def help_list(call: types.CallbackQuery):
-    await bot.delete_message(chat_id=call.from_user.id, message_id=call.message.message_id)
-    await call.message.answer('''Инструкция по использованию <b>GradeProgress Bot</b>:
+async def help_list_call(call: types.CallbackQuery):
+    await bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
+    await call.message.answer(instruction, reply_markup=back())
 
-1️⃣Кнопка <b>Начать</b> - приступить к опросу. Процесс опроса:
-  1-й этап. Ввод желаемого среднего балла;
-  2-й этап. Выбор способа расчёта:
 
-    1)"Количество отметок":
-      3-й этап. Ввод текущего количества отметок
-      4-й этап. Ввод текущего среднего балла
-
-    2)"Последовательность":
-      3-й этап. Ввод последовательности отметок
-
-2️⃣Кнопка <b>Оставить отзыв</b> - оценить бота. Так вы сможете повлиять на дальнейшее развитие бота 
-
-3️⃣Кнопка <b>Помощь</b> - показать инструкцию по использованию <b>GradeProgress Bot</b>
-''', reply_markup=back())
+async def help_list_msg(message: types.Message):
+    global instruction
+    await message.answer(instruction, reply_markup=back())
 
 
 def register_handlers_menu(dp: Dispatcher):
     dp.register_message_handler(main, commands='start', state='*')
     dp.register_message_handler(main, text='В меню', state='*')
-    dp.register_message_handler(help_list, commands='help')
-    dp.register_callback_query_handler(help_list, text='help')
+    dp.register_message_handler(help_list_msg, commands='help')
+    dp.register_callback_query_handler(help_list_call, text='help')
