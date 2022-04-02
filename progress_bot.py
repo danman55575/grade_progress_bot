@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.INFO)
 
 menu.register_handlers_menu(dp)
 maincourse.register_handlers_maincourse(dp)
-comment.register_handlers_review(dp)
+review.register_handlers_review(dp)
 admin.register_handlers_admin(dp)
 
 
