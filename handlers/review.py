@@ -36,7 +36,7 @@ async def apply(message: types.Message, state: FSMContext):
     await state.finish()
 
 
-def register_handlers_comment(dp: Dispatcher):
+def register_handlers_review(dp: Dispatcher):
     dp.register_callback_query_handler(review_request, text='review')
     dp.register_message_handler(review_command, commands='review')
     dp.register_message_handler(apply, state=StQuiz.waiting_comment)
