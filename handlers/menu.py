@@ -49,7 +49,7 @@ async def main(message: types.Message, state: FSMContext):
     keyboard.add(*buttons)
     finish = time.time()
     await message.answer(f'Привет! Это <b>главное меню</b>, здесь представлены все основные функции '
-                         'бота <i>GradeProgress Bot</i>.\nПрошло {finish-start} секунд', reply_markup=keyboard)
+                         f'бота <i>GradeProgress Bot</i>.\nПрошло {finish-start} секунд', reply_markup=keyboard)
     await state.finish()
 
 
