@@ -3,6 +3,7 @@ from bot_manager import bot, admin, URI
 from keyboards import back
 from aiogram.dispatcher import FSMContext
 import psycopg2
+import time
 instruction = """Инструкция по использованию <b>GradeProgress Bot</b>:
 
 1️⃣Кнопка <b>Начать</b> - приступить к опросу. Процесс опроса:
@@ -23,6 +24,7 @@ instruction = """Инструкция по использованию <b>GradePr
 
 
 async def main(message: types.Message, state: FSMContext):
+    start = time.time()
     db = psycopg2.connect(URI)
     db.autocommit = True
     cursor = db.cursor()
@@ -45,8 +47,9 @@ async def main(message: types.Message, state: FSMContext):
                types.InlineKeyboardButton(text='Помощь', callback_data='help'),
                types.InlineKeyboardButton(text='Оставить отзыв📢', callback_data='review')]
     keyboard.add(*buttons)
-    await message.answer('Привет! Это <b>главное меню</b>, здесь представлены все основные функции '
-                         'бота <i>GradeProgress Bot</i>.', reply_markup=keyboard)
+    finish = time.time()
+    await message.answer(f'Привет! Это <b>главное меню</b>, здесь представлены все основные функции '
+                         'бота <i>GradeProgress Bot</i>.\nПрошло {finish-start} секунд', reply_markup=keyboard)
     await state.finish()
 
 
