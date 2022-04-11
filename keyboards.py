@@ -62,24 +62,8 @@ def againboard():
     return markup
 
 
-def adminlookboard():
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1, one_time_keyboard=True)
-    query1 = types.KeyboardButton('SELECT user_id, user_name FROM my_users')
-    query2 = types.KeyboardButton('SELECT id, user_id, name FROM comment LIMIT 3, 5')
-    query3 = types.KeyboardButton('SELECT id, user_id, name FROM comment')
-    markup.add(query1, query2, query3)
-    return markup
-
-
-def admindeleteboard():
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1, one_time_keyboard=True)
-    query1 = types.KeyboardButton('DELETE FROM comment WHERE id < 10')
-    markup.add(query1)
-    return markup
-
-
 def adminreply():
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    query = types.KeyboardButton('security_piano_Gmoll_admin')
+    query = types.KeyboardButton('/admin3027')
     markup.add(query)
     return markup
