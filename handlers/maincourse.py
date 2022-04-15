@@ -146,7 +146,7 @@ async def table(message: types.Message):
         elif grade == 3:
             table3 += f'\nПри {answer:2}-ой отметке "3" средний балл:  👉{nowscore}'
     if table5 == '':
-        await message.answer(f'Поздравляю, средний балл "{score}" уже достигнут!', reply_markup=back())
+        await message.answer(f'Количество отметок больше 99!\nПроверь введённые данные на наличие ошибки👆', reply_markup=back())
     else:
         await message.answer(f'📋Мини-табель "Прогресс" при получении отметки "5":' + table5, reply_markup=finish2())
     if table4 != '':
